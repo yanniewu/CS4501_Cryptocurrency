@@ -1,2 +1,3 @@
-# cs4501
-CS4501: Cryptocurrency
+UVA CS4501: Cryptocurrency
+
+Bloomfield, Fall 2023
