@@ -1,0 +1,113 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <title>DAO Information</title>
+        <meta charset="utf-8">
+        <script src="web3.min.js"></script>
+        <style>
+            table, th, td {
+                border: 1px solid;
+            }
+        </style>
+    </head>
+    <body style="margin-top:0">
+        <h2>DAO Information</h2>
+        <p>The DAO purpose is: <span id="purpose"></span></p>
+        <p>How to join the DAO: <span id="join"></span></p>
+        <p>Total proposals: <span id="numberOfProposals"></span></p> <!-- line 12 -->
+        <table id="proposal_list">
+                </table>
+        <script>
+            var addr = '0x3cebbd53D5D0C55bbb1a56f6A316f187304fFA27';
+
+            let web3 = new Web3('wss://andromeda.cs.virginia.edu/geth');
+
+            abi = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"proposalID","type":"uint256"},{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":true,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"string","name":"description","type":"string"}],"name":"NewProposal","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"proposalID","type":"uint256"},{"indexed":true,"internalType":"bool","name":"result","type":"bool"}],"name":"ProposalClosed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"proposalID","type":"uint256"},{"indexed":true,"internalType":"bool","name":"position","type":"bool"},{"indexed":true,"internalType":"address","name":"voter","type":"address"}],"name":"Voted","type":"event"},{"inputs":[{"internalType":"address","name":"who","type":"address"}],"name":"addMember","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"proposalID","type":"uint256"}],"name":"closeProposal","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"curator","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"howToJoin","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"who","type":"address"}],"name":"isMember","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"minProposalDebatePeriod","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"string","name":"description","type":"string"},{"internalType":"uint256","name":"debatingPeriod","type":"uint256"}],"name":"newProposal","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"numberOfProposals","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"i","type":"uint256"}],"name":"proposals","outputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"bool","name":"","type":"bool"},{"internalType":"bool","name":"","type":"bool"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"purpose","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"requestMembership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"reservedEther","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokens","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"proposalID","type":"uint256"},{"internalType":"bool","name":"supportsProposal","type":"bool"}],"name":"vote","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"a","type":"address"},{"internalType":"uint256","name":"pid","type":"uint256"}],"name":"votedNo","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"a","type":"address"},{"internalType":"uint256","name":"pid","type":"uint256"}],"name":"votedYes","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"stateMutability":"payable","type":"receive"}]; 
+
+            contract = new web3.eth.Contract(abi,addr);
+
+            const getProposal = async(i) => {
+                return await contract.methods.proposals(i).call();
+            }
+
+            const getNumProposals = async() => {
+                return await contract.methods.numberOfProposals().call();
+            }
+
+            const getPurpose = async() => {
+                return await contract.methods.purpose().call();
+            }
+
+            const getJoin = async() => {
+                return await contract.methods.howToJoin().call();
+            }
+
+            const getVotes = async(i) => {
+                let x = await contract.methods.votes().call();
+                return [x.name,x.votes];
+            }
+
+            const setProposalInfo = async(i) => {
+                getProposal(i).then(l => { document.getElementById("id_"+i).innerHTML = parseInt(i);
+                                            document.getElementById("recipient_"+i).innerHTML = l[0];
+                                            document.getElementById("amount_"+i).innerHTML = l[1];
+                                            document.getElementById("description_"+i).innerHTML = l[2];
+                                            document.getElementById("votingDeadline_"+i).innerHTML = new Date(parseInt(l[3]) * 1000);
+                                            document.getElementById("open_"+i).innerHTML = l[4];
+                                            document.getElementById("proposalPassed_"+i).innerHTML = l[5];
+                                            document.getElementById("yea_"+i).innerHTML = l[6];
+                                            document.getElementById("nay_"+i).innerHTML = l[7];
+                                            document.getElementById("creator_"+i).innerHTML = l[8];
+                                            });
+            }
+
+            function subscribeToPollEvents() {
+                var options = { address: addr };
+                var sub = web3.eth.subscribe('logs', options, function(err,event) {
+                    if ( !err )
+                        console.log("event error: "+event);
+                });
+                // pay attention to these subscription events:
+                sub.on('data', event => loadTable() )
+                sub.on('error', err => { throw err })
+            }
+
+            function loadTable() {
+                // The "main" part of this script -- once we know how many choices there are.
+                // document.getElementById("proposals").innerHTML = "0";
+
+                // create the table body to list the votes and choices
+                text = "<tr><th>ID</th><th>Recipient</th><th>Amount</th><th>Description</th><th>Voting Deadline</th><th>Open</th><th>Proposal Passed</th><th>Yea</th><th>Nay</th><th>Creator</th></tr>";
+
+                getNumProposals().then(val => {
+                    document.getElementById("numberOfProposals").innerHTML = val;       
+                    
+                    // for each of the choices, create a separate table row with unique IDs
+                    for ( var i = 0; i < val; i++ )
+                        text += "<tr><td id='id_" + i + "'>" + i + "</td><td id='recipient_" + i + "'></td><td id='amount_" + i + "'></td><td id='description_" + i + "'></td><td id='votingDeadline_" + i + "'></td><td id='open_" + i + "'></td><td id='proposalPassed_" + i + "'></td><td id='yea_" + i + "'></td><td id='nay_" + i + "'></td><td id='creator_" + i + "'></td></tr>";
+                    // write the table to the HTML page; this must happen BEFORE we start filling in the votes and choices
+                    document.getElementById("proposal_list").innerHTML = text;
+                    // call the async function that will fill in the number of votes and choices into the table
+                    for ( var i = 0; i < val; i++ )
+                        setProposalInfo(i);
+                });
+
+                getPurpose().then(val => {
+                    // update the purpose field
+                    document.getElementById("purpose").innerHTML = val;
+                    console.log(val);
+                });
+
+                getJoin().then(val => {
+                    // update the how to join field
+                    document.getElementById("join").innerHTML = val;
+                    console.log(val);
+                });
+            }
+
+        subscribeToPollEvents();
+        loadTable();
+        </script>
+    </body>
+</html>

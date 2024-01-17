@@ -1,0 +1,41 @@
+# This is the geth configuration file for the fall 2023 version of CS 4501:
+# Cryptocurrency
+
+# You need to change three values in this file; search for "CHANGE ME"
+# (without the quotes) to find those values.
+
+[Eth]
+NetworkId = 67834504
+SyncMode = "full"
+NoPruning = true
+Preimages = true
+EnablePreimageRecording = true
+EthDiscoveryURLs = []
+SnapDiscoveryURLs = []
+
+[Node]
+# CHANGE ME to your UVA userid
+UserIdent = "ylw4sj"
+# CHANGE ME to the full path name of your data directory.  Absolute paths will
+# work better here.  A Windows directory will be of the form:
+# DataDir = "c:/users/mst3k/geth"
+DataDir = "ethprivate"
+HTTPHost = "127.0.0.1"
+# CHANGE ME: In HW S5, you should maek this change; you won't know this value
+# in HW S4. Change the packacge:// part only if you are using Desktop Remix,
+# and then only change it to the value that the pop-up window tells you to use.
+HTTPCors = ["https://remix.ethereum.org", "package://6fd22d6fe5549ad4c4d8fd3ca0b7816b.mod"]
+HTTPPort = 8545
+HTTPModules = ["net", "web3", "eth"]
+HTTPVirtualHosts = ["localhost"]
+WSHost = "127.0.0.1"
+WSPort = 8546
+WSModules = ["net", "web3", "eth"]
+WSOrigins = ["localhost", "127.0.0.1", "*"]
+InsecureUnlockAllowed = true
+AllowUnprotectedTxs = true
+
+[Node.P2P]
+NoDiscovery = true
+StaticNodes = ["enode://15d973bcb69f70f9ebbab1d18ab64f708ed6ae19f747514466f4ad90cfef2e8dfbe84d40ebda9b38ff3feaa314c90f5406482942242d3af0a7d5bed60c1e39cb@128.143.67.84:30303?discport=0"]
+MaxPeers = 1
